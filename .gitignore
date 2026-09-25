@@ -1,0 +1,92 @@
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ==============================
+# Virtual environments
+# ==============================
+venv/
+.venv/
+env/
+ENV/
+
+# ==============================
+# Environment / Secrets
+# ==============================
+.env
+.env.*
+!.env.example
+
+# API keys / credentials
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# ==============================
+# IDE
+# ==============================
+.vscode/
+.idea/
+
+# ==============================
+# OS
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Logs
+# ==============================
+*.log
+logs/
+
+# ==============================
+# Jupyter
+# ==============================
+.ipynb_checkpoints/
+
+# ==============================
+# Python generated files
+# ==============================
+*.egg-info/
+dist/
+build/
+
+# ==============================
+# Large ML / Vector files
+# ==============================
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+
+# ==============================
+# Local databases / generated data
+# ==============================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==============================
+# Docker local files
+# ==============================
+docker-compose.override.yml
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
+*.swp
+data/
+models/
