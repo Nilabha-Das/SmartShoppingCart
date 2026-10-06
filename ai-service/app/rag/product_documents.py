@@ -1,12 +1,27 @@
+import os
 import pandas as pd
 
-MASTER_PRODUCTS_PATH = "/app/data/phase1/master_products.csv"
+
+DEFAULT_MASTER_PRODUCTS_PATH = "/app/data/phase1/master_products.csv"
 
 
 class ProductDocumentStore:
 
-    def __init__(self):
-        self.products = pd.read_csv(MASTER_PRODUCTS_PATH)
+    def __init__(self, products_path=None):
+
+        self.products_path = (
+            products_path
+            or os.getenv(
+                "MASTER_PRODUCTS_PATH",
+                DEFAULT_MASTER_PRODUCTS_PATH
+            )
+        )
+
+        print(
+            f"Loading products from: {self.products_path}"
+        )
+
+        self.products = pd.read_csv(self.products_path)
 
     def create_product_document(self, row):
         return f"""

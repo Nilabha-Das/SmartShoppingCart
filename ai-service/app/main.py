@@ -3,6 +3,7 @@ from app.recommender.content_based import ContentBasedRecommender
 from app.recommender.collaborative import CollaborativeRecommender
 from app.recommender.hybrid import HybridRecommender
 from app.rag.retriever import ProductRetriever
+from app.pipeline.shopping_search import ShoppingSearchPipeline
 
 app = FastAPI(title="Smart Shopping Cart AI Service")
 
@@ -12,6 +13,7 @@ hybrid_recommender = HybridRecommender(
     content_recommender, collaborative_recommender
 );
 rag_retriever = ProductRetriever(top_k = 5)
+shopping_pipeline = ShoppingSearchPipeline()
 
 @app.get("/")
 def root():
@@ -91,3 +93,7 @@ def retrieve_products(query: str, top_k: int = 5, max_price: float = None, veget
         },
         "results": results
     }
+
+@app.get("/shopping/search")
+def shopping_search(message: str):
+    return shopping_pipeline.search(message)

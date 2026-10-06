@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
@@ -16,7 +18,10 @@ def main():
 
     print("Loading product data...")
 
-    document_store = ProductDocumentStore()
+    clean_dataset_path = os.getenv("MASTER_PRODUCTS_PATH")
+    document_store = ProductDocumentStore(
+        products_path = clean_dataset_path
+    )
     products = document_store.products
 
     products = products.copy()

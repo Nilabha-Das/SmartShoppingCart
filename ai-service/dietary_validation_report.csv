@@ -1,0 +1,29 @@
+product_id,product_name,product_type,vegetarian,vegan,confidence,issues
+P000029,Paratha Puff,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P000663,Instant Noodles - Pepper Crab Flavor,Imported Noodles,True,True,HIGH,Animal-product term in product name: crab
+P000823,"Spring Roll Sheets - 6""x6""",Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P000972,Medium Prawns,Frozen Non-Veg Snacks,True,True,HIGH,Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True | Animal-product term in product name: prawns
+P001449,Good Bite Natural - Beef,Pet Meals & Treats,True,True,HIGH,Animal-product term in product name: beef
+P001506,6 Corn Wraps Try It With Prawns & Avocado,Nachos & Chips,True,True,HIGH,Animal-product term in product name: prawns
+P001756,Seafood Party Ramen,Imported Noodles,True,True,HIGH,Animal-product term in product name: seafood
+P002043,Pork - 10 Hot Dog Skinless Sausages,Meats & Sausages,True,True,HIGH,Animal-product term in product name: pork
+P002444,Murgh Malai Chicken Tikka,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P002674,Pork - Pepperoni Salami,Frozen Non-Veg Snacks,True,True,HIGH,"Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True | Animal-product term in product name: pork, salami"
+P003078,Pork - Liver Pate,Meats & Sausages,True,True,HIGH,Animal-product term in product name: pork
+P003348,Noodles - Seafood,Imported Noodles,True,True,HIGH,Animal-product term in product name: seafood
+P006322,Hara Bhara Kebab,Frozen Non-Veg Snacks,True,True,HIGH,Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True
+P008394,Instant Noodles - Seafood,Imported Noodles,True,True,HIGH,Animal-product term in product name: seafood
+P010728,Samosa Patti,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P011953,Ocean Fresh - Seerfish Prime Steaks (Individually Frozen),Frozen Non-Veg Snacks,True,True,HIGH,Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True
+P013064,Achari Chicken Tikka,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P013797,Pickle - Brinjal (Egg Plant) In Oil,Other Veg Pickle,False,False,MEDIUM,Veg product_type but vegetarian=False
+P015068,"Spring Rolls Sheets - 8""x 8""",Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P015198,Oriental instant Noodles - Crab Flavour,Imported Noodles,True,True,HIGH,Animal-product term in product name: crab
+P018604,Good Bite Natural - Ham,Pet Meals & Treats,True,True,HIGH,Animal-product term in product name: ham
+P020202,Pork - Cocktail Skinless Sausages,Meats & Sausages,True,True,HIGH,Animal-product term in product name: pork
+P020307,Bockwurst - Pork,Frozen Non-Veg Snacks,True,True,HIGH,Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True | Animal-product term in product name: pork
+P021587,Jumbo Prawns,Frozen Non-Veg Snacks,True,True,HIGH,Non-Veg product_type but vegetarian=True | Non-Veg product_type but vegan=True | Animal-product term in product name: prawns
+P023097,Bowl Noodles - Seafood,Imported Noodles,True,True,HIGH,Animal-product term in product name: seafood
+P023421,Party Pack,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P025560,Amritsari Chicken Tikka,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False
+P025648,Chicken Tikka Masala,Frozen Veg Snacks,False,False,MEDIUM,Veg product_type but vegetarian=False

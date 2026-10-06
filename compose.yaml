@@ -9,8 +9,11 @@ services:
     
     volumes:
       - ./ai-service/app:/app/app
+      - ./ai-service/tests:/tests
       - ./models:/app/models:ro
       - ./data:/app/data:ro
+      - ./validation:/validation
+      
     
     environment:
       PYTHONUNBUFFERED: "1"

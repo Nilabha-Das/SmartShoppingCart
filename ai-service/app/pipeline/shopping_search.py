@@ -2,6 +2,7 @@ from app.genai.intent_parser import IntentParser
 from app.rag.taxonomy_resolver import TaxonomyResolver
 from app.rag.retriever import ProductRetriever
 from app.genai.response_generator import ResponseGenerator
+from app.genai.constraint_normalizer import ConstraintNormalizer
 
 class ShoppingSearchPipeline:
 
@@ -15,6 +16,10 @@ class ShoppingSearchPipeline:
 
         # Step 1: Understand the user's request
         intent = self.intent_parser.parse(user_message)
+        intent = ConstraintNormalizer.normalize(
+            intent,
+            user_message
+        )
 
         taxonomy = self.taxonomy_resolver.resolve(
             user_query=user_message,

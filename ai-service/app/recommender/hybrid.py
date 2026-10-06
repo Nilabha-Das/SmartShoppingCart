@@ -4,117 +4,275 @@ from sklearn.preprocessing import MinMaxScaler
 
 class HybridRecommender:
 
-    def __init__(self, content_recommender, collaborative_recommender):
-        self.content_recommender = content_recommender
-        self.collaborative_recommender = collaborative_recommender
+    def __init__(
+        self,
+        collaborative_recommender,
+        content_recommender,
+        collaborative_weight=0.6,
+        content_weight=0.4,
+    ):
+        self.collaborative = collaborative_recommender
+        self.content = content_recommender
 
-    def recommend(self, customer_id, n=10):
+        self.collaborative_weight = collaborative_weight
+        self.content_weight = content_weight
 
-        # Get collaborative candidates
+    def _extract_product_ids(self, history):
+
+        if history is None:
+            return []
+
+        # DataFrame
+        if isinstance(history, pd.DataFrame):
+            if "product_id" in history.columns:
+                return (
+                    history["product_id"]
+                    .astype(str)
+                    .tolist()
+                )
+
+        # List / tuple
+        if isinstance(history, (list, tuple)):
+
+            product_ids = []
+
+            for item in history:
+
+                if isinstance(item, dict):
+                    if "product_id" in item:
+                        product_ids.append(
+                            str(item["product_id"])
+                        )
+
+                else:
+                    product_ids.append(str(item))
+
+            return product_ids
+
+        return []
+
+    def recommend(
+        self,
+        customer_id,
+        n=10,
+        n_similar=20,
+        n_candidates=50,
+    ):
+
+        # ----------------------------------------------------
+        # COLLABORATIVE CANDIDATES
+        # ----------------------------------------------------
+
         collaborative_candidates = (
-            self.collaborative_recommender.recommend(
-                customer_id,
-                n_candidates=50
+            self.collaborative.recommend(
+                customer_id=customer_id,
+                n_similar=n_similar,
+                n_candidates=n_candidates,
             )
         )
 
-        if collaborative_candidates.empty:
-            return pd.DataFrame()
+        if collaborative_candidates is None:
+            collaborative_candidates = []
 
-        # Products purchased by the customer
-        # Products purchased by the customer
-
-        customer_index = (
-            self.collaborative_recommender
-            .customer_to_index
-            [customer_id]
-        )
-
-        customer_row = (
-            self.collaborative_recommender
-            .interaction_matrix
-            .getrow(customer_index)
-        )
-
-        purchased_products = [
-            self.collaborative_recommender.products[
-                product_index
-            ]
-            for product_index in customer_row.indices
-        ]
-
-        # Convert purchased products to TF-IDF indices
-        purchased_indices = [
-            self.content_recommender.product_to_index[p]
-            for p in purchased_products
-            if p in self.content_recommender.product_to_index
-        ]
-
-        if not purchased_indices:
-            collaborative_candidates["content_score"] = 0.0
-        else:
-
-            purchased_vectors = (
-                self.content_recommender.tfidf_matrix[
-                    purchased_indices
-                ]
+        # Convert old DataFrame interface if necessary.
+        if isinstance(
+            collaborative_candidates,
+            pd.DataFrame
+        ):
+            collaborative_candidates = (
+                collaborative_candidates
+                .to_dict("records")
             )
 
-            content_scores = []
+        # ----------------------------------------------------
+        # CUSTOMER HISTORY
+        # ----------------------------------------------------
 
-            for product_id in collaborative_candidates["product_id"]:
+        history = self.collaborative.get_customer_history(
+            customer_id
+        )
 
-                if product_id not in self.content_recommender.product_to_index:
-                    content_scores.append(0.0)
+        purchased_products = set(
+            self._extract_product_ids(history)
+        )
+
+        # ----------------------------------------------------
+        # CONTENT SCORES
+        # ----------------------------------------------------
+
+        content_scores = {}
+
+        for candidate in collaborative_candidates:
+
+            product_id = str(
+                candidate["product_id"]
+            )
+
+            if product_id in purchased_products:
+                continue
+
+            max_content_score = 0.0
+
+            for purchased_product in purchased_products:
+
+                similar = (
+                    self.content
+                    .recommend_similar_products(
+                        purchased_product,
+                        n=20
+                    )
+                )
+
+                if similar is None:
                     continue
 
-                product_index = (
-                    self.content_recommender.product_to_index[
-                        product_id
+                if isinstance(similar, pd.DataFrame):
+
+                    if similar.empty:
+                        continue
+
+                    matches = similar[
+                        similar["product_id"]
+                        .astype(str)
+                        == product_id
                     ]
-                )
 
-                product_vector = (
-                    self.content_recommender.tfidf_matrix[
-                        product_index
-                    ]
-                )
+                    if not matches.empty:
 
-                similarities = (
-                    product_vector @ purchased_vectors.T
-                ).toarray().flatten()
+                        score = float(
+                            matches.iloc[0][
+                                "content_score"
+                            ]
+                        )
 
-                content_scores.append(
-                    float(similarities.max())
-                )
+                        max_content_score = max(
+                            max_content_score,
+                            score
+                        )
 
-            collaborative_candidates["content_score"] = (
-                content_scores
+                elif isinstance(similar, list):
+
+                    for item in similar:
+
+                        if not isinstance(item, dict):
+                            continue
+
+                        if str(
+                            item.get("product_id")
+                        ) == product_id:
+
+                            score = float(
+                                item.get(
+                                    "content_score",
+                                    0.0
+                                )
+                            )
+
+                            max_content_score = max(
+                                max_content_score,
+                                score
+                            )
+
+            content_scores[product_id] = (
+                max_content_score
             )
 
-        # Normalize both recommendation signals
+        # ----------------------------------------------------
+        # BUILD SCORE TABLE
+        # ----------------------------------------------------
+
+        rows = []
+
+        for candidate in collaborative_candidates:
+
+            product_id = str(
+                candidate["product_id"]
+            )
+
+            if product_id in purchased_products:
+                continue
+
+            collaborative_score = float(
+                candidate.get("score", 0.0)
+            )
+
+            content_score = float(
+                content_scores.get(
+                    product_id,
+                    0.0
+                )
+            )
+
+            rows.append(
+                {
+                    "product_id": product_id,
+                    "collaborative_score":
+                        collaborative_score,
+                    "content_score":
+                        content_score,
+                }
+            )
+
+        if not rows:
+            return []
+
+        df = pd.DataFrame(rows)
+
+        # ----------------------------------------------------
+        # NORMALIZE COLLABORATIVE SCORE
+        # ----------------------------------------------------
+
         scaler = MinMaxScaler()
 
-        collaborative_candidates[
-            ["collaborative_score", "content_score"]
-        ] = scaler.fit_transform(
-            collaborative_candidates[
-                ["collaborative_score", "content_score"]
-            ]
-        )
+        if df["collaborative_score"].nunique() <= 1:
 
-        # Existing hybrid weighting
-        collaborative_candidates["hybrid_score"] = (
-            0.6 * collaborative_candidates["collaborative_score"]
-            + 0.4 * collaborative_candidates["content_score"]
-        )
+            df["collaborative_normalized"] = 0.0
 
-        return (
-            collaborative_candidates
-            .sort_values(
-                "hybrid_score",
-                ascending=False
+        else:
+
+            df[
+                "collaborative_normalized"
+            ] = scaler.fit_transform(
+                df[["collaborative_score"]]
             )
-            .head(n)
-            .reset_index(drop=True)
+
+        # ----------------------------------------------------
+        # NORMALIZE CONTENT SCORE
+        # ----------------------------------------------------
+
+        if df["content_score"].nunique() <= 1:
+
+            df["content_normalized"] = 0.0
+
+        else:
+
+            df[
+                "content_normalized"
+            ] = scaler.fit_transform(
+                df[["content_score"]]
+            )
+
+        # ----------------------------------------------------
+        # HYBRID SCORE
+        # ----------------------------------------------------
+
+        df["hybrid_score"] = (
+            self.collaborative_weight
+            * df["collaborative_normalized"]
+            +
+            self.content_weight
+            * df["content_normalized"]
+        )
+
+        # ----------------------------------------------------
+        # FINAL RANKING
+        # ----------------------------------------------------
+
+        df = df.sort_values(
+            "hybrid_score",
+            ascending=False
+        )
+
+        return df.head(n).to_dict(
+            "records"
         )

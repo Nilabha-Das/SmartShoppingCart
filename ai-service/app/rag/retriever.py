@@ -182,18 +182,29 @@ class ProductRetriever:
         for result in results:
 
             retrieved_products.append(
-                {
-                    "product_id": result.payload.get("product_id"),
-                    "product_name": result.payload.get("product_name"),
-                    "brand": result.payload.get("brand"),
-                    "category": result.payload.get("category"),
-                    "subcategory": result.payload.get("subcategory"),
-                    "price": result.payload.get("price"),
-                    "rating": result.payload.get("rating"),
-                    "protein_g": result.payload.get("protein_g"),
-                    "sugar_g": result.payload.get("sugar_g"),
-                    "score": result.score,
-                    "document": result.payload.get("document")
+            {
+                "product_id": result.payload.get("product_id"),
+                "product_name": result.payload.get("product_name"),
+                "brand": result.payload.get("brand"),
+                "category": result.payload.get("category"),
+                "subcategory": result.payload.get("subcategory"),
+                "price": result.payload.get("price"),
+                "rating": result.payload.get("rating"),
+                "protein_g": result.payload.get("protein_g"),
+                "sugar_g": result.payload.get("sugar_g"),
+
+                # Dietary attributes
+                "vegetarian": result.payload.get("vegetarian"),
+                "vegan": result.payload.get("vegan"),
+                "gluten_free": result.payload.get("gluten_free"),
+
+                # Other product attributes
+                "contains_milk": result.payload.get("contains_milk"),
+                "contains_nuts": result.payload.get("contains_nuts"),
+                "contains_soy": result.payload.get("contains_soy"),
+
+                "score": result.score,
+                "document": result.payload.get("document")
                 }
             )
 
