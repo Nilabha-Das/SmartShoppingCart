@@ -1,3 +1,4 @@
+
 import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -15,38 +16,28 @@ def search(message):
         return json.loads(response.read().decode("utf-8"))
 
 
-def test_vegetarian_products_are_actually_vegetarian():
+def test_vegetarian_filter_does_not_claim_unverified_safety():
     data = search("vegetarian snacks")
 
-    assert data["status"] == "resolved"
-
-    products = data["products"]
-
-    assert len(products) > 0
-
-    for product in products:
-        assert product["vegetarian"] is True
+    assert data["status"] == "dietary_unverified"
+    assert data["products"] == []
 
 
-def test_pork_product_not_returned_as_vegetarian():
+def test_pork_product_not_returned_when_dietary_data_unverified():
     data = search("vegetarian high protein snacks under 300")
 
-    assert data["status"] == "resolved"
-
-    product_ids = [
-        product["product_id"]
-        for product in data["products"]
-    ]
-
-    assert "P002674" not in product_ids
+    assert data["status"] in {
+        "dietary_unverified",
+        "nutrition_unverified",
+    }
+    assert data["products"] == []
 
 
-def test_combined_dietary_constraints():
+def test_combined_dietary_constraints_are_blocked_safely():
     data = search("vegetarian high protein snacks under 300")
 
-    assert data["status"] == "resolved"
-
-    for product in data["products"]:
-        assert product["vegetarian"] is True
-        assert product["protein_g"] >= 10
-        assert product["price"] <= 300
+    assert data["status"] in {
+        "dietary_unverified",
+        "nutrition_unverified",
+    }
+    assert data["products"] == []

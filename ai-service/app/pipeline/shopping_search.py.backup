@@ -1,0 +1,324 @@
+
+from app.genai.intent_parser import IntentParser
+from app.rag.taxonomy_resolver import TaxonomyResolver
+from app.rag.retriever import ProductRetriever
+from app.genai.response_generator import ResponseGenerator
+from app.genai.constraint_normalizer import ConstraintNormalizer
+from app.session_preferences import SessionPreferenceStore
+from app.preference_questions import PreferenceQuestionManager
+
+from app.nutrition_safety import (
+    NUTRITION_UNVERIFIED_MESSAGE,
+    has_unverified_nutrition_constraint,
+)
+
+from app.dietary_safety import (
+    DIETARY_UNVERIFIED_MESSAGE,
+    has_unverified_dietary_constraint,
+)
+
+
+class ShoppingSearchPipeline:
+    def __init__(self):
+        self.intent_parser = IntentParser()
+        self.retriever = ProductRetriever(top_k=5)
+        self.response_generator = ResponseGenerator()
+        self.taxonomy_resolver = TaxonomyResolver()
+
+        # Session-scoped preference state.
+        self.preference_store = SessionPreferenceStore()
+        self.question_manager = PreferenceQuestionManager(
+            self.preference_store
+        )
+
+        # Temporary in-memory record of searches awaiting an answer.
+        self.pending_searches = {}
+
+    @staticmethod
+    def _public_products(products):
+        """
+        Return only approved catalog fields.
+
+        Do not expose unverified nutrition values, dietary flags,
+        allergen flags, raw product documents, or internal scores.
+        """
+        allowed_fields = (
+            "product_id",
+            "product_name",
+            "brand",
+            "category",
+            "subcategory",
+            "price",
+            "rating",
+        )
+
+        return [
+            {
+                key: product.get(key)
+                for key in allowed_fields
+            }
+            for product in products
+        ]
+
+    def search(
+        self,
+        user_message: str,
+        session_id: str = "default",
+        ask_preferences: bool = False,
+    ):
+        # Validate the request.
+        if not session_id or not session_id.strip():
+            return {
+                "status": "invalid_session",
+                "products": [],
+                "response": "A non-empty session_id is required.",
+            }
+
+        if not user_message or not user_message.strip():
+            return {
+                "status": "invalid_message",
+                "products": [],
+                "response": "Please provide a shopping query.",
+                "session_id": session_id,
+            }
+
+        # A new search replaces any unanswered search for this session.
+        self.pending_searches.pop(session_id, None)
+
+        # Step 1: Parse and normalize the current request.
+        intent = self.intent_parser.parse(user_message)
+        intent = ConstraintNormalizer.normalize(intent, user_message)
+
+        # Step 2: Block explicit nutrition-dependent requests.
+        # Nutrition data has not been verified, so do not use it to
+        # filter or recommend products.
+        if has_unverified_nutrition_constraint(
+            high_protein=intent.high_protein,
+            low_sugar=intent.low_sugar,
+        ):
+            return {
+                "status": "nutrition_unverified",
+                "intent": intent.model_dump(),
+                "products": [],
+                "response": NUTRITION_UNVERIFIED_MESSAGE,
+                "session_id": session_id,
+            }
+
+        # Step 3: Block explicit dietary-dependent requests.
+        # Product dietary flags have known data-quality issues.
+        if has_unverified_dietary_constraint(
+            vegetarian=intent.vegetarian,
+            vegan=intent.vegan,
+            gluten_free=intent.gluten_free,
+        ):
+            return {
+                "status": "dietary_unverified",
+                "intent": intent.model_dump(),
+                "products": [],
+                "response": DIETARY_UNVERIFIED_MESSAGE,
+                "session_id": session_id,
+            }
+
+        # Step 4: Merge saved preferences.
+        self.preference_store.update_from_intent(
+            session_id,
+            intent,
+        )
+
+        intent = self.preference_store.merge_into_intent(
+            session_id,
+            intent,
+        )
+
+        # Saved preferences must not bypass the safety guards.
+        if has_unverified_nutrition_constraint(
+            high_protein=intent.high_protein,
+            low_sugar=intent.low_sugar,
+        ):
+            return {
+                "status": "nutrition_unverified",
+                "intent": intent.model_dump(),
+                "products": [],
+                "response": NUTRITION_UNVERIFIED_MESSAGE,
+                "session_id": session_id,
+            }
+
+        if has_unverified_dietary_constraint(
+            vegetarian=intent.vegetarian,
+            vegan=intent.vegan,
+            gluten_free=intent.gluten_free,
+        ):
+            return {
+                "status": "dietary_unverified",
+                "intent": intent.model_dump(),
+                "products": [],
+                "response": DIETARY_UNVERIFIED_MESSAGE,
+                "session_id": session_id,
+            }
+
+        # Never apply saved nutrition preferences as active filters.
+        intent = intent.model_copy(
+            update={
+                "high_protein": None,
+                "low_sugar": None,
+            }
+        )
+
+        # Step 5: Resolve taxonomy before asking questions or retrieving.
+        taxonomy = self.taxonomy_resolver.resolve(
+            user_query=user_message,
+            category=intent.category,
+            subcategory=intent.subcategory,
+        )
+
+        if taxonomy["status"] == "ambiguous":
+            clarification = (
+                self.response_generator.generate_clarification(
+                    user_message=user_message,
+                    intent=intent.model_dump(),
+                    taxonomy=taxonomy,
+                )
+            )
+
+            return {
+                "status": "ambiguous",
+                "intent": intent.model_dump(),
+                "taxonomy": taxonomy,
+                "products": [],
+                "response": clarification,
+                "session_id": session_id,
+            }
+
+        if taxonomy["status"] == "unknown":
+            return {
+                "status": "unknown",
+                "intent": intent.model_dump(),
+                "taxonomy": taxonomy,
+                "products": [],
+                "response": (
+                    "I couldn't identify the product category. "
+                    "Could you clarify which type you mean?"
+                ),
+                "session_id": session_id,
+            }
+
+        category = taxonomy.get("category")
+
+        # Step 6: Ask at most one preference question before retrieval.
+        if ask_preferences:
+            question = self.question_manager.select_question(
+                session_id=session_id,
+                intent=intent,
+                category=category,
+            )
+
+            if question is not None:
+                self.pending_searches[session_id] = {
+                    "user_message": user_message,
+                    "preference": question["preference"],
+                }
+
+                return {
+                    **question,
+                    "intent": intent.model_dump(),
+                    "taxonomy": taxonomy,
+                    "products": [],
+                    "session_id": session_id,
+                }
+
+        # Step 7: Retrieve using supported catalog constraints only.
+        # Dietary and nutrition flags are deliberately not used.
+        products = self.retriever.retrieve(
+            query=intent.query,
+            category=category,
+            subcategory=taxonomy.get("subcategory"),
+            max_price=intent.max_price,
+            vegetarian=None,
+            vegan=None,
+            gluten_free=None,
+            high_protein=None,
+            low_sugar=None,
+        )
+
+        # Step 8: Generate the customer-facing response.
+        response = self.response_generator.generate(
+            user_message=user_message,
+            intent=intent.model_dump(),
+            products=products,
+        )
+
+        # Step 9: Return only approved public catalog fields.
+        return {
+            "status": "resolved",
+            "intent": intent.model_dump(),
+            "taxonomy": taxonomy,
+            "products": self._public_products(products),
+            "response": response,
+            "session_id": session_id,
+        }
+
+    def answer_preference(
+        self,
+        session_id: str,
+        preference: str,
+        answer: str,
+    ):
+        if not session_id or not session_id.strip():
+            return {
+                "status": "invalid_session",
+                "message": "A non-empty session_id is required.",
+                "session_id": session_id,
+            }
+
+        pending = self.pending_searches.get(session_id)
+
+        if pending is None:
+            return {
+                "status": "no_pending_question",
+                "message": (
+                    "There is no pending preference question "
+                    "for this session. Start a search first."
+                ),
+                "session_id": session_id,
+            }
+
+        if pending["preference"] != preference:
+            return {
+                "status": "unexpected_preference",
+                "message": (
+                    "Please answer the preference question "
+                    "that was asked."
+                ),
+                "expected_preference": pending["preference"],
+                "session_id": session_id,
+            }
+
+        # Invalid answers must not consume the pending search.
+        result = self.question_manager.process_answer(
+            session_id=session_id,
+            preference=preference,
+            answer=answer,
+        )
+
+        if result["status"] != "answer_saved":
+            return {
+                **result,
+                "session_id": session_id,
+            }
+
+        # Preserve the original query and consume the pending question.
+        original_message = pending["user_message"]
+        self.pending_searches.pop(session_id, None)
+
+        # Resume the original search without asking another question.
+        search_result = self.search(
+            user_message=original_message,
+            session_id=session_id,
+            ask_preferences=False,
+        )
+
+        return {
+            **search_result,
+            "preference_answer": result,
+            "session_id": session_id,
+        }

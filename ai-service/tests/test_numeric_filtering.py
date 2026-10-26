@@ -1,3 +1,4 @@
+
 import json
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -18,11 +19,8 @@ def search(message):
 def test_high_protein_filter():
     data = search("protein snacks")
 
-    assert data["status"] == "resolved"
-    assert len(data["products"]) > 0
-
-    for product in data["products"]:
-        assert product["protein_g"] >= 10
+    assert data["status"] == "nutrition_unverified"
+    assert data["products"] == []
 
 
 def test_max_price_filter():
@@ -38,9 +36,5 @@ def test_max_price_filter():
 def test_combined_price_and_protein_filter():
     data = search("high protein snacks under 300")
 
-    assert data["status"] == "resolved"
-    assert len(data["products"]) > 0
-
-    for product in data["products"]:
-        assert product["protein_g"] >= 10
-        assert product["price"] <= 300
+    assert data["status"] == "nutrition_unverified"
+    assert data["products"] == []

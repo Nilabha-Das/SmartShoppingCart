@@ -1,0 +1,43 @@
+scenario_id,context_type,purpose,method,category,target_preference,selected_preference,question_asked,selected_question_matches_latent_target,answer_saved,target_preference_captured,catalog_products_before_constraints,catalog_products_after_known_constraints,catalog_empty_after_constraints,target_compliance_rate_when_captured,evaluation_type
+aligned_budget,aligned,I want affordable choices for my snacks,no_elicitation,Snacks & Branded Foods,max_price,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_budget,aligned,I want affordable choices for my snacks,fixed_question,Snacks & Branded Foods,max_price,max_price,1,1,1,1,2814,2369,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_budget,aligned,I want affordable choices for my snacks,adaptive_question,Snacks & Branded Foods,max_price,max_price,1,1,1,1,2814,2369,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_vegetarian,aligned,I prefer meat-free options for my snacks,no_elicitation,Snacks & Branded Foods,vegetarian,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_vegetarian,aligned,I prefer meat-free options for my snacks,fixed_question,Snacks & Branded Foods,vegetarian,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+aligned_vegetarian,aligned,I prefer meat-free options for my snacks,adaptive_question,Snacks & Branded Foods,vegetarian,vegetarian,1,1,1,1,2814,2648,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_vegan,aligned,I prefer plant-based choices for my snacks,no_elicitation,Snacks & Branded Foods,vegan,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_vegan,aligned,I prefer plant-based choices for my snacks,fixed_question,Snacks & Branded Foods,vegan,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+aligned_vegan,aligned,I prefer plant-based choices for my snacks,adaptive_question,Snacks & Branded Foods,vegan,vegan,1,1,1,1,2814,2115,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_gluten_free,aligned,I need gluten-free choices for my snacks,no_elicitation,Snacks & Branded Foods,gluten_free,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_gluten_free,aligned,I need gluten-free choices for my snacks,fixed_question,Snacks & Branded Foods,gluten_free,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+aligned_gluten_free,aligned,I need gluten-free choices for my snacks,adaptive_question,Snacks & Branded Foods,gluten_free,gluten_free,1,1,1,1,2814,2380,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_high_protein,aligned,I want snacks for my gym routine,no_elicitation,Snacks & Branded Foods,high_protein,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_high_protein,aligned,I want snacks for my gym routine,fixed_question,Snacks & Branded Foods,high_protein,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+aligned_high_protein,aligned,I want snacks for my gym routine,adaptive_question,Snacks & Branded Foods,high_protein,high_protein,1,1,1,1,2814,559,0,1.0,simulated_policy_and_catalog_constraint_check
+aligned_low_sugar,aligned,I want less sugar in my snacks,no_elicitation,Snacks & Branded Foods,low_sugar,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+aligned_low_sugar,aligned,I want less sugar in my snacks,fixed_question,Snacks & Branded Foods,low_sugar,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+aligned_low_sugar,aligned,I want less sugar in my snacks,adaptive_question,Snacks & Branded Foods,low_sugar,low_sugar,1,1,1,1,2814,1019,0,1.0,simulated_policy_and_catalog_constraint_check
+neutral_budget,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,max_price,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_budget,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,max_price,max_price,1,1,1,1,2814,2369,0,1.0,simulated_policy_and_catalog_constraint_check
+neutral_budget,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,max_price,max_price,1,1,1,1,2814,2369,0,1.0,simulated_policy_and_catalog_constraint_check
+neutral_vegetarian,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,vegetarian,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_vegetarian,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,vegetarian,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_vegetarian,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,vegetarian,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_vegan,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,vegan,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_vegan,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,vegan,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_vegan,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,vegan,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_gluten_free,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,gluten_free,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_gluten_free,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,gluten_free,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_gluten_free,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,gluten_free,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_high_protein,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,high_protein,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_high_protein,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,high_protein,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_high_protein,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,high_protein,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_low_sugar,neutral,I am looking for snacks,no_elicitation,Snacks & Branded Foods,low_sugar,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+neutral_low_sugar,neutral,I am looking for snacks,fixed_question,Snacks & Branded Foods,low_sugar,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+neutral_low_sugar,neutral,I am looking for snacks,adaptive_question,Snacks & Branded Foods,low_sugar,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_protein,mixed,I want snacks for my gym routine and less sugar,no_elicitation,Snacks & Branded Foods,high_protein,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_protein,mixed,I want snacks for my gym routine and less sugar,fixed_question,Snacks & Branded Foods,high_protein,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_protein,mixed,I want snacks for my gym routine and less sugar,adaptive_question,Snacks & Branded Foods,high_protein,low_sugar,1,0,1,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_sugar,mixed,I want snacks for my gym routine and less sugar,no_elicitation,Snacks & Branded Foods,low_sugar,,0,0,0,0,2814,2814,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_sugar,mixed,I want snacks for my gym routine and less sugar,fixed_question,Snacks & Branded Foods,low_sugar,max_price,1,0,1,0,2814,2369,0,,simulated_policy_and_catalog_constraint_check
+mixed_gym_low_sugar_target_sugar,mixed,I want snacks for my gym routine and less sugar,adaptive_question,Snacks & Branded Foods,low_sugar,low_sugar,1,1,1,1,2814,1019,0,1.0,simulated_policy_and_catalog_constraint_check

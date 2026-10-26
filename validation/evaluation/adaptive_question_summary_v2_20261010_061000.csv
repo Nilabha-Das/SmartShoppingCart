@@ -1,0 +1,10 @@
+context_type,method,scenarios,mean_questions_asked,target_question_match_rate,answer_saved_rate,target_preference_capture_rate,mean_catalog_products_after_constraints,empty_catalog_rate,mean_target_compliance_rate_when_captured,evaluation_type
+aligned,no_elicitation,6,0.0,0.0,0.0,0.0,2814.0,0.0,,simulated_policy_and_catalog_constraint_check
+aligned,fixed_question,6,1.0,0.16666666666666666,1.0,0.16666666666666666,2369.0,0.0,1.0,simulated_policy_and_catalog_constraint_check
+aligned,adaptive_question,6,1.0,1.0,1.0,1.0,1848.3333333333333,0.0,1.0,simulated_policy_and_catalog_constraint_check
+neutral,no_elicitation,6,0.0,0.0,0.0,0.0,2814.0,0.0,,simulated_policy_and_catalog_constraint_check
+neutral,fixed_question,6,1.0,0.16666666666666666,1.0,0.16666666666666666,2369.0,0.0,1.0,simulated_policy_and_catalog_constraint_check
+neutral,adaptive_question,6,1.0,0.16666666666666666,1.0,0.16666666666666666,2369.0,0.0,1.0,simulated_policy_and_catalog_constraint_check
+mixed,no_elicitation,2,0.0,0.0,0.0,0.0,2814.0,0.0,,simulated_policy_and_catalog_constraint_check
+mixed,fixed_question,2,1.0,0.0,1.0,0.0,2369.0,0.0,,simulated_policy_and_catalog_constraint_check
+mixed,adaptive_question,2,1.0,0.5,1.0,0.5,1916.5,0.0,1.0,simulated_policy_and_catalog_constraint_check
