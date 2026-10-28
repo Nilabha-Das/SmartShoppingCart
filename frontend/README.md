@@ -1,5 +1,16 @@
 # React + Vite
 
+## Run the frontend
+
+Open a terminal in this `frontend` directory, then run:
+
+```sh
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite (usually `http://localhost:5173`). To verify a production build, run `npm run build`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
